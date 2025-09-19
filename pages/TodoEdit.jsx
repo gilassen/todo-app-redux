@@ -1,5 +1,7 @@
 import { saveTodo, loadTodos } from "../store/actions/todo.actions.js"
 import { showErrorMsg, showSuccessMsg } from "../services/event-bus.service.js"
+import { ColorInput } from "../cmps/ColorInput.jsx"
+
 
 const { useState, useEffect } = React
 const { useNavigate, useParams } = ReactRouterDOM
@@ -14,21 +16,17 @@ export function TodoEdit() {
     const params = useParams()
 
     useEffect(() => {
-        if (params.todoId) {
-            const todo = todos.find(t => t._id === params.todoId)
-            if (todo) setTodoToEdit(todo)
-            else {
-                loadTodos()
-                    .then(() => {
-                        const loadedTodo = todos.find(t => t._id === params.todoId)
-                        if (loadedTodo) setTodoToEdit(loadedTodo)
-                    })
-                    .catch(() => showErrorMsg("Cannot load todo"))
-            }
-        } else {
-            setTodoToEdit({ txt: "", importance: 1, isDone: false })
+    if (params.todoId) {
+        const todo = todos.find(t => t._id === params.todoId)
+        if (todo) setTodoToEdit(todo)
+        else {
+            loadTodos()
+                .catch(() => showErrorMsg("Cannot load todo"))
         }
-    }, [params.todoId, todos])
+    } else {
+        setTodoToEdit({ txt: "", importance: 1, isDone: false, color: "#F44236" })
+    }
+}, [params.todoId, todos])
 
     function handleChange({ target }) {
         const field = target.name
@@ -61,7 +59,7 @@ export function TodoEdit() {
 
     if (!todoToEdit) return <div>Loading...</div>
 
-    const { txt, importance, isDone } = todoToEdit
+    const { txt, importance, isDone, color } = todoToEdit
 
     return (
         <section className="todo-edit">
@@ -74,6 +72,15 @@ export function TodoEdit() {
 
                 <label htmlFor="isDone">isDone:</label>
                 <input onChange={handleChange} checked={isDone} type="checkbox" name="isDone" id="isDone" />
+
+                <label htmlFor="color">Color:</label>
+                <ColorInput
+                selectedColor={color}
+                onSetColor={(color) =>
+                    setTodoToEdit(prev => ({ ...prev, color }))
+                }
+                />
+
 
                 <button>Save</button>
             </form>

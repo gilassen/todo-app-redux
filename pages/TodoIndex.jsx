@@ -24,7 +24,10 @@ export function TodoIndex() {
     }, [filterBy])
 
     function onRemoveTodo(todoId) {
-        removeTodo(todoId)
+        const isConfirmed = window.confirm("Are you sure you want to delete this todo?")
+        if (!isConfirmed) return
+
+            removeTodo(todoId)
             .then(() => showSuccessMsg(`Todo removed`))
             .catch(() => showErrorMsg("Cannot remove todo " + todoId))
     }
