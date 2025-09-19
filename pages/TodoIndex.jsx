@@ -2,8 +2,8 @@ import { TodoFilter } from "../cmps/TodoFilter.jsx"
 import { TodoList } from "../cmps/TodoList.jsx"
 import { DataTable } from "../cmps/data-table/DataTable.jsx"
 import { showErrorMsg, showSuccessMsg } from "../services/event-bus.service.js"
-import { loadTodos, removeTodo, saveTodo } from "../sore/actions/todo.actions.js"
-import { SET_FILTER_BY } from "../sore/reducers/todo.reducer.js"
+import { loadTodos, removeTodo, saveTodo } from "../store/actions/todo.actions.js"
+import { SET_FILTER_BY } from "../store/reducers/todo.reducer.js"
 
 const { Link, useSearchParams } = ReactRouterDOM
 const { useSelector, useDispatch } = ReactRedux

@@ -1,27 +1,24 @@
-const { useEffect, useState } = React
-import {Chart} from '../cmps/Chart.jsx'
-import { todoService } from '../services/todo.service.js'
+const { useEffect } = React
+const { useSelector } = ReactRedux
+import { loadTodos, loadStats } from "../store/actions/todo.actions.js"
+import { Chart } from "../cmps/Chart.jsx"
 
 export function Dashboard() {
+    const todos = useSelector(storeState => storeState.todoModule.todos)
+    const stats = useSelector(storeState => storeState.todoModule.stats)
+    const isLoading = useSelector(storeState => storeState.todoModule.isLoading)
 
-    const [todos, setTodos] = useState([])
-    const [importanceStats, setImportanceStats] = useState([])
+    useEffect(() => {
+        if (!todos.length) loadTodos()
+        if (!stats) loadStats()
+    }, [todos.length, stats])
 
-    useEffect(()=>{
-        todoService.query()
-            .then(setTodos)
-        todoService.getImportanceStats()
-            .then(setImportanceStats)
-    }, [])
-
+    if (isLoading && !stats) return <div>Loading...</div>
 
     return (
         <section className="dashboard">
-            <h1>Dashboard</h1>
-            <h2>Statistics for {todos.length} Todos</h2>
-            <hr />
-            <h4>By Importance</h4>
-            <Chart data={importanceStats}/>
+            <h2>Todos Statistics</h2>
+            {stats && <Chart stats={stats} />}
         </section>
     )
 }

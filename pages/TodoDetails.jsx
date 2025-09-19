@@ -1,6 +1,6 @@
-import { useEffect } from "react"
-import { useSelector } from "react-redux"
-import { useParams, useNavigate, Link } from "react-router-dom"
+const { useEffect } = React
+const { useSelector } = ReactRedux
+const { useParams, useNavigate, Link } = ReactRouterDOM
 import { loadTodoById } from "../store/actions/todo.actions.js"
 import { showErrorMsg } from "../services/event-bus.service.js"
 

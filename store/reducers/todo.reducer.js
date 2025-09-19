@@ -5,13 +5,15 @@ export const UPDATE_TODO = 'UPDATE_TODO'
 export const SET_FILTER_BY = 'SET_FILTER_BY'
 export const UNDO_TODOS = 'UNDO_TODOS'
 export const SET_LOADING = 'SET_LOADING'
-export const SET_TODO = 'SET_TODO' 
+export const SET_TODO = 'SET_TODO'
+export const SET_STATS = 'SET_STATS'
 
 const initialState = {
     todos: [],
     lastTodos: [],
     filterBy: { status: 'all', txt: '', importance: '' },
-    isLoading: false
+    isLoading: false,
+    stats: null
 }
 
 export function todoReducer(state = initialState, cmd) {
@@ -19,7 +21,7 @@ export function todoReducer(state = initialState, cmd) {
         case SET_TODOS:
             return { ...state, todos: cmd.todos }
 
-        case SET_TODO: 
+        case SET_TODO:
             const exists = state.todos.some(t => t._id === cmd.todo._id)
             return exists
                 ? { ...state, todos: state.todos.map(t => t._id === cmd.todo._id ? cmd.todo : t) }
@@ -49,6 +51,9 @@ export function todoReducer(state = initialState, cmd) {
 
         case SET_LOADING:
             return { ...state, isLoading: cmd.isLoading }
+
+        case SET_STATS:
+            return { ...state, stats: cmd.stats }
 
         default:
             return state

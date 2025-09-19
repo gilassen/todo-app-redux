@@ -1,4 +1,4 @@
-import { saveTodo, loadTodos } from "../sore/actions/todo.actions.js"
+import { saveTodo, loadTodos } from "../store/actions/todo.actions.js"
 import { showErrorMsg, showSuccessMsg } from "../services/event-bus.service.js"
 
 const { useState, useEffect } = React

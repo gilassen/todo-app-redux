@@ -6,7 +6,8 @@ import {
     UPDATE_TODO, 
     UNDO_TODOS, 
     SET_LOADING,
-    SET_TODO
+    SET_TODO,
+    SET_STATS
 } from "../reducers/todo.reducer.js"
 import { store } from "../store.js"
 
@@ -16,6 +17,7 @@ export function loadTodos(filterBy) {
         .then(todos => {
             store.dispatch({ type: SET_TODOS, todos })
             store.dispatch({ type: SET_LOADING, isLoading: false })
+            return todos
         })
         .catch(err => {
             console.log('todo action -> Cannot load todos', err)
@@ -34,6 +36,21 @@ export function loadTodoById(todoId) {
         })
         .catch(err => {
             console.log("todo action -> Cannot load todo", err)
+            store.dispatch({ type: SET_LOADING, isLoading: false })
+            throw err
+        })
+}
+
+export function loadStats() {
+    store.dispatch({ type: SET_LOADING, isLoading: true })
+    return todoService.getImportanceStats()
+        .then(stats => {
+            store.dispatch({ type: SET_STATS, stats })
+            store.dispatch({ type: SET_LOADING, isLoading: false })
+            return stats
+        })
+        .catch(err => {
+            console.log("todo action -> Cannot load stats", err)
             store.dispatch({ type: SET_LOADING, isLoading: false })
             throw err
         })
