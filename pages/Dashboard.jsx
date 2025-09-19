@@ -18,7 +18,7 @@ export function Dashboard() {
     return (
         <section className="dashboard">
             <h2>Todos Statistics</h2>
-            {stats && <Chart stats={stats} />}
+            {stats && <Chart data={stats} />}
         </section>
     )
 }
