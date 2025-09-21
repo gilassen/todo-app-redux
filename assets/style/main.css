@@ -23,4 +23,5 @@
 @import "cmps/TodoDetails.css";
 @import "cmps/TodoEdit.css";
 
-@import "cmps/ColorInput.css"
+@import "cmps/ColorInput.css";
+@import "cmps/UserDetails.css";

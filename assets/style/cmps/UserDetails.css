@@ -1,0 +1,17 @@
+.user-details {
+  padding: 20px;
+  border-radius: 8px;
+  min-height: 200px;
+  transition: all 0.3s ease;
+}
+
+.user-details h2 {
+  margin-bottom: 10px;
+}
+
+.user-details form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 250px;
+}

@@ -1,5 +1,6 @@
 import { utilService } from './util.service.js'
 import { storageService } from './async-storage.service.js'
+import { userService } from './user.service.js'
 
 const TODO_KEY = 'todoDB'
 _createTodos()
@@ -52,17 +53,27 @@ function get(todoId) {
 
 function remove(todoId) {
     return storageService.remove(TODO_KEY, todoId)
+        .then(() => {
+            userService.addActivity(`Removed a Todo (id: ${todoId})`)
+        })
 }
+
 
 function save(todo) {
     if (todo._id) {
-        // TODO - updatable fields
         todo.updatedAt = Date.now()
         return storageService.put(TODO_KEY, todo)
+            .then(savedTodo => {
+                userService.addActivity(`Updated a Todo: '${savedTodo.txt}'`)
+                return savedTodo
+            })
     } else {
         todo.createdAt = todo.updatedAt = Date.now()
-
         return storageService.post(TODO_KEY, todo)
+            .then(savedTodo => {
+                userService.addActivity(`Added a Todo: '${savedTodo.txt}'`)
+                return savedTodo
+            })
     }
 }
 

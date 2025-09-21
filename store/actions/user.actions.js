@@ -47,3 +47,15 @@ export function checkout(diff) {
             throw err
         })
 }
+
+export function updateUser(user) {
+    return userService.save(user)
+        .then(savedUser => {
+            store.dispatch({ type: SET_USER, user: savedUser })
+            return savedUser
+        })
+        .catch(err => {
+            console.error('user actions -> Cannot update user', err)
+            throw err
+        })
+}
