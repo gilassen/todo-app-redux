@@ -1,11 +1,11 @@
-import { showErrorMsg, showSuccessMsg } from '../services/event-bus.service.js'
-import { userService } from '../services/user.service.js'
+import { showErrorMsg, showSuccessMsg } from "../services/event-bus.service.js"
+import { userService } from "../services/user.service.js"
+import { login, signup } from "../store/actions/user.actions.js"
 
 const { useState } = React
 
-export function LoginSignup({ onSetUser }) {
-
-    const [isSignup, setIsSignUp] = useState(false)
+export function LoginSignup() {
+    const [isSignup, setIsSignup] = useState(false)
     const [credentials, setCredentials] = useState(userService.getEmptyCredentials())
 
     function handleChange({ target }) {
@@ -15,26 +15,15 @@ export function LoginSignup({ onSetUser }) {
 
     function handleSubmit(ev) {
         ev.preventDefault()
-        onLogin(credentials)
-    }
-
-
-    function onLogin(credentials) {
-        isSignup ? signup(credentials) : login(credentials)
-    }
-
-    function login(credentials) {
-        userService.login(credentials)
-            .then(onSetUser)
-            .then(() => { showSuccessMsg('Logged in successfully') })
-            .catch((err) => { showErrorMsg('Oops try again') })
-    }
-
-    function signup(credentials) {
-        userService.signup(credentials)
-            .then(onSetUser)
-            .then(() => { showSuccessMsg('Signed in successfully') })
-            .catch((err) => { showErrorMsg('Oops try again') })
+        if (isSignup) {
+            signup(credentials)
+                .then(() => showSuccessMsg("Signed up successfully"))
+                .catch(() => showErrorMsg("Oops try again"))
+        } else {
+            login(credentials)
+                .then(() => showSuccessMsg("Logged in successfully"))
+                .catch(() => showErrorMsg("Oops try again"))
+        }
     }
 
     return (
@@ -58,25 +47,24 @@ export function LoginSignup({ onSetUser }) {
                     required
                     autoComplete="off"
                 />
-                {isSignup && <input
-                    type="text"
-                    name="fullname"
-                    value={credentials.fullname}
-                    placeholder="Full name"
-                    onChange={handleChange}
-                    required
-                />}
-                <button>{isSignup ? 'Signup' : 'Login'}</button>
+                {isSignup && (
+                    <input
+                        type="text"
+                        name="fullname"
+                        value={credentials.fullname}
+                        placeholder="Full name"
+                        onChange={handleChange}
+                        required
+                    />
+                )}
+                <button type="submit">{isSignup ? "Signup" : "Login"}</button>
             </form>
 
             <div className="btns">
-                <a href="#" onClick={() => setIsSignUp(!isSignup)}>
-                    {isSignup ?
-                        'Already a member? Login' :
-                        'New user? Signup here'
-                    }
-                </a >
+                <button type="button" onClick={() => setIsSignup(!isSignup)}>
+                    {isSignup ? "Already a member? Login" : "New user? Signup here"}
+                </button>
             </div>
-        </div >
+        </div>
     )
 }
