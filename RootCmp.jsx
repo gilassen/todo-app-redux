@@ -14,6 +14,8 @@ import { AboutTeam } from "./cmps/AboutTeam.jsx"
 import { AboutVision } from "./cmps/AboutVision.jsx"
 import { Dashboard } from "./pages/Dashboard.jsx"
 import { UserDetails } from "./pages/UserDetails.jsx"
+import { AppLoader } from "./cmps/AppLoader.jsx"
+
 
 
 export function RootCmp() {
@@ -22,6 +24,7 @@ export function RootCmp() {
             <Router>
                 <section className="app main-layout">
                     <AppHeader />
+                    <AppLoader /> 
                     <main>
                         <Routes>
                             <Route path="/" element={<Home />} />
