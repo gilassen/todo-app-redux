@@ -1,4 +1,7 @@
 import { todoService } from "../../services/todo.service.js"
+import { userService } from "../../services/user.service.js"
+import { updateUser } from "./user.actions.js"
+
 import { 
     ADD_TODO, 
     REMOVE_TODO, 
@@ -79,9 +82,24 @@ export function removeTodo(todoId) {
 
 export function saveTodo(todo) {
     const type = todo._id ? UPDATE_TODO : ADD_TODO
+    const isUpdate = Boolean(todo._id)
+
     return todoService.save(todo)
         .then((savedTodo) => {
             store.dispatch({ type, todo: savedTodo })
+
+            if (isUpdate && savedTodo.isDone) {
+                const loggedInUser = userService.getLoggedinUser()
+                if (loggedInUser) {
+                    const updatedUser = {
+                        ...loggedInUser,
+                        balance: (loggedInUser.balance || 0) + 10
+                    }
+                    userService.addActivity(loggedInUser._id, `Completed a Todo: '${savedTodo.txt}'`)
+                    updateUser(updatedUser)
+                }
+            }
+
             return savedTodo
         })
         .catch(err => {
