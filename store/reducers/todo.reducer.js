@@ -7,11 +7,13 @@ export const UNDO_TODOS = 'UNDO_TODOS'
 export const SET_LOADING = 'SET_LOADING'
 export const SET_TODO = 'SET_TODO'
 export const SET_STATS = 'SET_STATS'
+export const SET_SORT = 'SET_SORT'
+export const SET_PAGE = 'SET_PAGE'
 
 const initialState = {
     todos: [],
     lastTodos: [],
-    filterBy: { status: 'all', txt: '', importance: '' },
+    filterBy: { status: 'all', txt: '', importance: '', sortBy: 'txt', pageIdx: 0, pageSize: 5 },
     isLoading: false,
     stats: null
 }
@@ -54,6 +56,18 @@ export function todoReducer(state = initialState, cmd) {
 
         case SET_STATS:
             return { ...state, stats: cmd.stats }
+        
+        case SET_SORT:
+            return {
+                ...state,
+                filterBy: { ...state.filterBy, sortBy: cmd.sortBy }
+            }
+            
+        case SET_PAGE:
+            return {
+                ...state,
+                filterBy: { ...state.filterBy, pageIdx: cmd.pageIdx }
+            }
 
         default:
             return state

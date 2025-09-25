@@ -15,7 +15,6 @@ export const todoService = {
     getFilterFromSearchParams,
     getImportanceStats,
 }
-// For Debug (easy access from console):
 window.cs = todoService
 
 function query(filterBy = {}) {
@@ -38,9 +37,23 @@ function query(filterBy = {}) {
                 }
             }
 
+            if (filterBy.sortBy) {
+                if (filterBy.sortBy === 'txt') {
+                    todos = todos.sort((a, b) => a.txt.localeCompare(b.txt))
+                } else if (filterBy.sortBy === 'importance') {
+                    todos = todos.sort((a, b) => b.importance - a.importance)
+                }
+            }
+
+            if (typeof filterBy.pageIdx === 'number' && filterBy.pageSize) {
+                const startIdx = filterBy.pageIdx * filterBy.pageSize
+                todos = todos.slice(startIdx, startIdx + filterBy.pageSize)
+            }
+
             return todos
         })
 }
+
 
 
 function get(todoId) {

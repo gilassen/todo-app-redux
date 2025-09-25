@@ -1,4 +1,4 @@
-import { todoService } from "../../services/todo.service.js"
+import { todoService, SET_SORT, SET_PAGE } from "../../services/todo.service.js"
 import { userService } from "../../services/user.service.js"
 import { updateUser } from "./user.actions.js"
 
@@ -106,4 +106,12 @@ export function saveTodo(todo) {
             console.log('todo action -> Cannot save todo', err)
             throw err
         })
+}
+
+export function setSort(sortBy) {
+    return { type: SET_SORT, sortBy }
+}
+
+export function setPage(pageIdx) {
+    return { type: SET_PAGE, pageIdx }
 }
