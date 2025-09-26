@@ -10,7 +10,7 @@ import { showErrorMsg, showSuccessMsg } from "../services/event-bus.service.js"
 export function AppHeader() {
     const navigate = useNavigate()
 
-    const user = useSelector(storeState => storeState.userModule.loggedInUser) // שים לב לשם אחיד
+    const user = useSelector(storeState => storeState.userModule.loggedInUser)
     const todos = useSelector(storeState => storeState.todoModule.todos)
 
     const doneTodos = todos.filter(t => t.isDone).length
@@ -26,7 +26,13 @@ export function AppHeader() {
     }
 
     return (
-        <header className="app-header full main-layout">
+        <header
+            className="app-header full main-layout"
+            style={{
+                backgroundColor: (user && user.prefs && user.prefs.bgColor) || "lightgray",
+                color: (user && user.prefs && user.prefs.color) || "black"
+            }}
+        >
             <section className="header-container">
                 <h1>React Todo App</h1>
                 {user ? (
