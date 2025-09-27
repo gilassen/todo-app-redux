@@ -45,16 +45,20 @@ function query(filterBy = {}) {
                 }
             }
 
-            if (typeof filterBy.pageIdx === 'number' && filterBy.pageSize) {
-                const startIdx = filterBy.pageIdx * filterBy.pageSize
-                todos = todos.slice(startIdx, startIdx + filterBy.pageSize)
-            }
+            // --- פאג'ינציה מתוקנת ---
+            const pageSize = filterBy.pageSize || 5
+            const totalTodos = todos.length
+            const maxPage = Math.ceil(totalTodos / pageSize) || 1
 
-            return todos
+            let pageIdx = (typeof filterBy.pageIdx === 'number') ? filterBy.pageIdx : 0
+            if (pageIdx >= maxPage) pageIdx = Math.max(maxPage - 1, 0)
+
+            const startIdx = pageIdx * pageSize
+            const todosPage = todos.slice(startIdx, startIdx + pageSize)
+
+            return { todos: todosPage, maxPage, pageIdx }
         })
 }
-
-
 
 function get(todoId) {
     return storageService.get(TODO_KEY, todoId)
@@ -70,7 +74,6 @@ function remove(todoId) {
             userService.addActivity(`Removed a Todo (id: ${todoId})`)
         })
 }
-
 
 function save(todo) {
     if (todo._id) {
@@ -107,15 +110,16 @@ function getFilterFromSearchParams(searchParams) {
     return filterBy
 }
 
-
 function getImportanceStats() {
     return storageService.query(TODO_KEY)
         .then(todos => {
             const todoCountByImportanceMap = _getTodoCountByImportanceMap(todos)
-            const data = Object.keys(todoCountByImportanceMap).map(speedName => ({ title: speedName, value: todoCountByImportanceMap[speedName] }))
+            const data = Object.keys(todoCountByImportanceMap).map(speedName => ({
+                title: speedName,
+                value: todoCountByImportanceMap[speedName]
+            }))
             return data
         })
-
 }
 
 function _createTodos() {
@@ -150,23 +154,10 @@ function _setNextPrevTodoId(todo) {
 }
 
 function _getTodoCountByImportanceMap(todos) {
-    const todoCountByImportanceMap = todos.reduce((map, todo) => {
+    return todos.reduce((map, todo) => {
         if (todo.importance < 3) map.low++
         else if (todo.importance < 7) map.normal++
         else map.urgent++
         return map
     }, { low: 0, normal: 0, urgent: 0 })
-    return todoCountByImportanceMap
 }
-
-
-// Data Model:
-// const todo = {
-//     _id: "gZ6Nvy",
-//     txt: "Master Redux",
-//     importance: 9,
-//     isDone: false,
-//     createdAt: 1711472269690,
-//     updatedAt: 1711472269690
-// }
-

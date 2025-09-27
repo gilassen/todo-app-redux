@@ -1,4 +1,4 @@
-import { todoService, SET_SORT, SET_PAGE } from "../../services/todo.service.js"
+import { todoService } from "../../services/todo.service.js"
 import { userService } from "../../services/user.service.js"
 import { updateUser } from "./user.actions.js"
 
@@ -10,51 +10,57 @@ import {
     UNDO_TODOS, 
     SET_LOADING,
     SET_TODO,
-    SET_STATS
+    SET_STATS,
+    SET_SORT,
+    SET_PAGE 
 } from "../reducers/todo.reducer.js"
 import { store } from "../store.js"
 
 export function loadTodos(filterBy) {
     store.dispatch({ type: SET_LOADING, isLoading: true })
     return todoService.query(filterBy)
-        .then(todos => {
+        .then(({ todos, maxPage, pageIdx }) => {
             store.dispatch({ type: SET_TODOS, todos })
-            store.dispatch({ type: SET_LOADING, isLoading: false })
+
+            const { filterBy: currFilter, maxPage: currMax } = store.getState().todoModule
+            const pageIdxChanged = currFilter.pageIdx !== pageIdx
+            const maxPageChanged = currMax !== maxPage
+
+            if (pageIdxChanged || maxPageChanged) {
+                store.dispatch({ type: SET_PAGE, pageIdx, maxPage })
+            }
+
             return todos
         })
         .catch(err => {
             console.log('todo action -> Cannot load todos', err)
-            store.dispatch({ type: SET_LOADING, isLoading: false })
             throw err
+        })
+        .finally(() => {
+            store.dispatch({ type: SET_LOADING, isLoading: false })
         })
 }
 
 export function loadTodoById(todoId) {
-    store.dispatch({ type: SET_LOADING, isLoading: true })
     return todoService.get(todoId)
         .then(todo => {
             store.dispatch({ type: SET_TODO, todo })
-            store.dispatch({ type: SET_LOADING, isLoading: false })
             return todo
         })
         .catch(err => {
             console.log("todo action -> Cannot load todo", err)
-            store.dispatch({ type: SET_LOADING, isLoading: false })
             throw err
         })
 }
 
 export function loadStats() {
-    store.dispatch({ type: SET_LOADING, isLoading: true })
     return todoService.getImportanceStats()
         .then(stats => {
             store.dispatch({ type: SET_STATS, stats })
-            store.dispatch({ type: SET_LOADING, isLoading: false })
             return stats
         })
         .catch(err => {
             console.log("todo action -> Cannot load stats", err)
-            store.dispatch({ type: SET_LOADING, isLoading: false })
             throw err
         })
 }
@@ -72,7 +78,13 @@ export function removeTodoOptimistic(todoId) {
 export function removeTodo(todoId) {
     return todoService.remove(todoId)
         .then(() => {
+            const { todos, filterBy, maxPage } = store.getState().todoModule
+            let newPageIdx = filterBy.pageIdx
+            if (todos.length === 1 && newPageIdx > 0) {
+                newPageIdx = newPageIdx - 1
+            }
             store.dispatch({ type: REMOVE_TODO, todoId })
+            store.dispatch({ type: SET_PAGE, pageIdx: newPageIdx, maxPage })
         })
         .catch(err => {
             console.log('todo action -> Cannot remove todo', err)
@@ -85,22 +97,25 @@ export function saveTodo(todo) {
     const isUpdate = Boolean(todo._id)
 
     return todoService.save(todo)
-        .then((savedTodo) => {
+        .then(savedTodo => {
             store.dispatch({ type, todo: savedTodo })
+            return todoService.query(store.getState().todoModule.filterBy)
+                .then(({ maxPage, pageIdx }) => {
+                    store.dispatch({ type: SET_PAGE, pageIdx, maxPage })
 
-            if (isUpdate && savedTodo.isDone) {
-                const loggedInUser = userService.getLoggedinUser()
-                if (loggedInUser) {
-                    const updatedUser = {
-                        ...loggedInUser,
-                        balance: (loggedInUser.balance || 0) + 10
+                    if (isUpdate && savedTodo.isDone) {
+                        const loggedInUser = userService.getLoggedinUser()
+                        if (loggedInUser) {
+                            const updatedUser = {
+                                ...loggedInUser,
+                                balance: (loggedInUser.balance || 0) + 10
+                            }
+                            userService.addActivity(loggedInUser._id, `Completed a Todo: '${savedTodo.txt}'`)
+                            updateUser(updatedUser)
+                        }
                     }
-                    userService.addActivity(loggedInUser._id, `Completed a Todo: '${savedTodo.txt}'`)
-                    updateUser(updatedUser)
-                }
-            }
-
-            return savedTodo
+                    return savedTodo
+                })
         })
         .catch(err => {
             console.log('todo action -> Cannot save todo', err)
@@ -109,9 +124,9 @@ export function saveTodo(todo) {
 }
 
 export function setSort(sortBy) {
-    return { type: SET_SORT, sortBy }
+    store.dispatch({ type: SET_SORT, sortBy })
 }
 
-export function setPage(pageIdx) {
-    return { type: SET_PAGE, pageIdx }
+export function setPage(pageIdx, maxPage) {
+    store.dispatch({ type: SET_PAGE, pageIdx, maxPage })
 }
