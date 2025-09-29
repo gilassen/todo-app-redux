@@ -45,7 +45,7 @@ function query(filterBy = {}) {
                 }
             }
 
-            // --- פאג'ינציה מתוקנת ---
+           
             const pageSize = filterBy.pageSize || 5
             const totalTodos = todos.length
             const maxPage = Math.ceil(totalTodos / pageSize) || 1

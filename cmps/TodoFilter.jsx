@@ -1,3 +1,5 @@
+import { useEffectUpdate } from "../customHooks/useEffectUpdate.js"
+
 const { useState, useEffect, useMemo } = React
 
 function debounce(func, wait) {
@@ -9,14 +11,14 @@ function debounce(func, wait) {
 }
 
 export function TodoFilter({ filterBy, onSetFilterBy }) {
-  const [filterByToEdit, setFilterByToEdit] = useState({ ...filterBy })
+  const [filterByToEdit, setFilterByToEdit] = useState(filterBy)
 
   const debouncedSetFilter = useMemo(
     () => debounce(onSetFilterBy, 400),
     [onSetFilterBy]
   )
 
-  useEffect(() => {
+  useEffectUpdate(() => {
     debouncedSetFilter(filterByToEdit)
     return () => {} 
   }, [filterByToEdit])

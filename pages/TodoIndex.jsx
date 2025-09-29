@@ -20,6 +20,8 @@ export function TodoIndex() {
     const [searchParams, setSearchParams] = useSearchParams()
     const [isLoaded, setIsLoaded] = useState(false)
 
+    
+
     useEffect(() => {
         setSearchParams(filterBy)
         eventBusService.emit("show-loader")
@@ -30,7 +32,8 @@ export function TodoIndex() {
                 setIsLoaded(true)
                 eventBusService.emit("hide-loader")
             })
-    }, [filterBy.txt, filterBy.importance, filterBy.status, filterBy.sortBy, filterBy.pageIdx])
+        console.log(filterBy)
+    }, [filterBy])
 
     function onRemoveTodo(todoId) {
         const isConfirmed = window.confirm("Are you sure you want to delete this todo?")
